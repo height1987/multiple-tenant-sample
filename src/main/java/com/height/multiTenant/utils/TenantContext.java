@@ -12,43 +12,43 @@ public class TenantContext implements Serializable {
     public final static String TENANT_CONTENT_KEY = "PARK_CONTENT_KEY";
     public final static String SPLITTER = "|";
 
-    private Integer parkId;
+    private Integer tenantId;
 
-    public static TenantContext getInstance(int parkId){
+    public static TenantContext getInstance(int tenantId){
         TenantContext tenantContext = new TenantContext();
-        tenantContext.setParkId(parkId);
+        tenantContext.setTenantId(tenantId);
         return tenantContext;
     }
 
     @Override
     public String toString(){
-        if(parkId == null || parkId == 0){
+        if(tenantId == null || tenantId == 0){
             return "";
         }
-        return parkId.toString();
+        return tenantId.toString();
     }
     public static TenantContext parse(String str){
         if(StringUtils.isBlank(str)){
             return EMPTY_CONTEXT;
         }
         try {
-            Integer parkId = Integer.parseInt(str);
+            Integer tenantId = Integer.parseInt(str);
             TenantContext context = new TenantContext();
-            context.setParkId(parkId);
+            context.setTenantId(tenantId);
             return context;
         }catch (Exception e){
-            logger.error("parse parkid error",e);
+            logger.error("parse tenantIdd error",e);
             return EMPTY_CONTEXT;
         }
 
     }
 
-    public Integer getParkId() {
-        return parkId;
+    public Integer getTenantId() {
+        return tenantId;
     }
 
-    public void setParkId(Integer parkId) {
-        this.parkId = parkId;
+    public void setTenantId(Integer tenantId) {
+        this.tenantId = tenantId;
     }
 
 }

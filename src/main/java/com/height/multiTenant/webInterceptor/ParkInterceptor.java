@@ -56,7 +56,7 @@ public class ParkInterceptor implements HandlerInterceptor {
 	private Integer getParkId(String tenantNo) {
 		// FIXME 这个要通过no换id。
 		// 如果直接把id放入cookie，则可能会有安全性问题
-		// parkNo可以跟进业务的情况生产，可以用长度为6位的随机字符串
+		// tenantNo可以跟进业务的情况生产，可以用长度为6位的随机字符串
 		return 1;
 	}
 

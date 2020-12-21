@@ -30,18 +30,18 @@ public class MultipleTenantInterceptor {
         interceptor.addInnerInterceptor(new TenantLineInnerInterceptor(new TenantLineHandler() {
             @Override
             public Expression getTenantId() {
-                String parkObject = RpcContext.getContext().getAttachment(TenantContext.TENANT_CONTENT_KEY);
-                if(parkObject == null){
+                String tenantObject = RpcContext.getContext().getAttachment(TenantContext.TENANT_CONTENT_KEY);
+                if(tenantObject == null){
                     logger.warn("PARK_CONTEXT IS INVALID : NULL !");
                     return DEFAULT_PARK_ID;
                 }
-                TenantContext tenantContext = TenantContext.parse(parkObject);
-                if(tenantContext == null || tenantContext.getParkId() == null || tenantContext.getParkId() == 0){
+                TenantContext tenantContext = TenantContext.parse(tenantObject);
+                if(tenantContext == null || tenantContext.getTenantId() == null || tenantContext.getTenantId() == 0){
                     logger.warn("PARK_ID IS INVALID : NULL OR 0 !");
                     return DEFAULT_PARK_ID;
                 }
-                logger.info("valid PARK_ID = "+ tenantContext.getParkId());
-                return new LongValue(tenantContext.getParkId());
+                logger.info("valid PARK_ID = "+ tenantContext.getTenantId());
+                return new LongValue(tenantContext.getTenantId());
             }
 
             @Override

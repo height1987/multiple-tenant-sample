@@ -12,14 +12,14 @@ public class MultipleTenantConsumerFilter implements Filter{
     protected  static final Logger logger = LoggerFactory.getLogger(MultipleTenantConsumerFilter.class);
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
-        String parkId = ThreadLocalUtils.getContextStr();
-        logger.info("MT_ConsumerFilter ： {}",parkId);
+        String tenantId = ThreadLocalUtils.getContextStr();
+        logger.info("MT_ConsumerFilter ： {}",tenantId);
 
-        if(StringUtils.isEmpty(parkId)){
+        if(StringUtils.isEmpty(tenantId)){
             String msg = "CONSUMER INVALID PARK_ID !!";
             logger.error(msg,new RuntimeException(msg));
         }else{
-            RpcContext.getContext().setAttachment(TenantContext.TENANT_CONTENT_KEY,parkId);
+            RpcContext.getContext().setAttachment(TenantContext.TENANT_CONTENT_KEY,tenantId);
         }
         return invoker.invoke(invocation);
     }
