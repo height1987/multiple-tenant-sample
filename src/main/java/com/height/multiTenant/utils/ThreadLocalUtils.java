@@ -7,15 +7,15 @@ public class ThreadLocalUtils {
             return "";
         }
     };
-    public static void setContextStr(String parkContext) {
-        threadLocal.set(parkContext);
+    public static void setContextStr(String tenantContext) {
+        threadLocal.set(tenantContext);
     }
 
     public static String getContextStr() {
         return threadLocal.get();
     }
 
-    public static ParkContext getContext() {
-        return ParkContext.parse(getContextStr());
+    public static TenantContext getContext() {
+        return TenantContext.parse(getContextStr());
     }
 }

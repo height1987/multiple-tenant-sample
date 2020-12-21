@@ -6,18 +6,18 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 
-public class ParkContext implements Serializable {
-    protected  static final Logger logger = LoggerFactory.getLogger(ParkContext.class);
-    public final static ParkContext EMPTY_CONTEXT = new ParkContext();
-    public final static String PARK_CONTENT_KEY = "PARK_CONTENT_KEY";
+public class TenantContext implements Serializable {
+    protected  static final Logger logger = LoggerFactory.getLogger(TenantContext.class);
+    public final static TenantContext EMPTY_CONTEXT = new TenantContext();
+    public final static String TENANT_CONTENT_KEY = "PARK_CONTENT_KEY";
     public final static String SPLITTER = "|";
 
     private Integer parkId;
 
-    public static ParkContext getInstance(int parkId){
-        ParkContext parkContext = new ParkContext();
-        parkContext.setParkId(parkId);
-        return parkContext;
+    public static TenantContext getInstance(int parkId){
+        TenantContext tenantContext = new TenantContext();
+        tenantContext.setParkId(parkId);
+        return tenantContext;
     }
 
     @Override
@@ -27,13 +27,13 @@ public class ParkContext implements Serializable {
         }
         return parkId.toString();
     }
-    public static ParkContext parse(String str){
+    public static TenantContext parse(String str){
         if(StringUtils.isBlank(str)){
             return EMPTY_CONTEXT;
         }
         try {
             Integer parkId = Integer.parseInt(str);
-            ParkContext context = new ParkContext();
+            TenantContext context = new TenantContext();
             context.setParkId(parkId);
             return context;
         }catch (Exception e){

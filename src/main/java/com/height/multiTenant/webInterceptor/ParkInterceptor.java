@@ -2,7 +2,7 @@ package com.height.multiTenant.webInterceptor;
 
 import com.alibaba.fastjson.JSONObject;
 import com.height.multiTenant.utils.CookieUtils;
-import com.height.multiTenant.utils.ParkContext;
+import com.height.multiTenant.utils.TenantContext;
 import com.height.multiTenant.utils.ThreadLocalUtils;
 import org.apache.dubbo.rpc.RpcContext;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ import java.io.IOException;
 public class ParkInterceptor implements HandlerInterceptor {
 
 	private static final String USER_ID = "USER_TOKEN";
-	private static final String PARK_NO = "PARK_NO";
+	private static final String TENANT_NO = "TENANT_NO";
 	protected final Logger logger = LoggerFactory.getLogger(ParkInterceptor.class);
 
 
@@ -33,30 +33,30 @@ public class ParkInterceptor implements HandlerInterceptor {
 	}
 
 	private boolean handleParkPermission(HttpServletRequest request, Integer userId) {
-		// 1.获取cookies中的 parkNo
-		// 2.根据parkNo获取parkId
-		// 3.check user和park的关系
-		// 4.向context中添加parkId
-		Cookie cookie = CookieUtils.getCookie(request, PARK_NO);
+		// 1.获取cookies中的 tenantNo
+		// 2.根据tenantNo获取tenantId
+		// 3.check user和tenant的关系
+		// 4.向context中添加tenantId
+		Cookie cookie = CookieUtils.getCookie(request, TENANT_NO);
 		if (cookie == null) {
-			logger.info("park_no cookie is null");
+			logger.info("tenantNo cookie is null");
 			return false;
 		}
-		String parkNo = cookie.getValue();
-		if (StringUtils.isEmpty(parkNo)) {
-			logger.info("parkNo is empty");
+		String tenantNo = cookie.getValue();
+		if (StringUtils.isEmpty(tenantNo)) {
+			logger.info("tenantNo is empty");
 			return false;
 		}
-		//TODO parkNo -> parkId
-		ThreadLocalUtils.setContextStr(ParkContext.getInstance(getParkId(parkNo)).toString());
-				RpcContext.getContext().getAttachment(ParkContext.PARK_CONTENT_KEY);
+		ThreadLocalUtils.setContextStr(TenantContext.getInstance(getParkId(tenantNo)).toString());
+				RpcContext.getContext().getAttachment(TenantContext.TENANT_CONTENT_KEY);
 		return true;
 
 	}
 
-	private Integer getParkId(String parkNo) {
+	private Integer getParkId(String tenantNo) {
 		// FIXME 这个要通过no换id。
 		// 如果直接把id放入cookie，则可能会有安全性问题
+		// parkNo可以跟进业务的情况生产，可以用长度为6位的随机字符串
 		return 1;
 	}
 

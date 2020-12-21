@@ -3,7 +3,7 @@ package com.height.multiTenant.mybatis;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
-import com.height.multiTenant.utils.ParkContext;
+import com.height.multiTenant.utils.TenantContext;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
 import org.apache.dubbo.rpc.RpcContext;
@@ -30,18 +30,18 @@ public class MultipleTenantInterceptor {
         interceptor.addInnerInterceptor(new TenantLineInnerInterceptor(new TenantLineHandler() {
             @Override
             public Expression getTenantId() {
-                String parkObject = RpcContext.getContext().getAttachment(ParkContext.PARK_CONTENT_KEY);
+                String parkObject = RpcContext.getContext().getAttachment(TenantContext.TENANT_CONTENT_KEY);
                 if(parkObject == null){
                     logger.warn("PARK_CONTEXT IS INVALID : NULL !");
                     return DEFAULT_PARK_ID;
                 }
-                ParkContext parkContext = ParkContext.parse(parkObject);
-                if(parkContext == null || parkContext.getParkId() == null || parkContext.getParkId() == 0){
+                TenantContext tenantContext = TenantContext.parse(parkObject);
+                if(tenantContext == null || tenantContext.getParkId() == null || tenantContext.getParkId() == 0){
                     logger.warn("PARK_ID IS INVALID : NULL OR 0 !");
                     return DEFAULT_PARK_ID;
                 }
-                logger.info("valid PARK_ID = "+ parkContext.getParkId());
-                return new LongValue(parkContext.getParkId());
+                logger.info("valid PARK_ID = "+ tenantContext.getParkId());
+                return new LongValue(tenantContext.getParkId());
             }
 
             @Override
