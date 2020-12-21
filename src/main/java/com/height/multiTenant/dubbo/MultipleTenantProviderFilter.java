@@ -1,7 +1,7 @@
 package com.height.multiTenant.dubbo;
 
 import com.height.multiTenant.utils.TenantContext;
-import com.height.multiTenant.utils.ThreadLocalUtils;
+import com.height.multiTenant.utils.TenantThreadLocalUtils;
 import org.apache.dubbo.common.utils.StringUtils;
 import org.apache.dubbo.rpc.*;
 import org.slf4j.Logger;
@@ -17,10 +17,15 @@ public class MultipleTenantProviderFilter implements Filter {
         String tenantId = RpcContext.getContext().getAttachment(TenantContext.TENANT_CONTENT_KEY);
 
         if(!StringUtils.isEmpty(tenantId)){
-            ThreadLocalUtils.setContextStr(tenantId);
+            TenantThreadLocalUtils.setContextStr(tenantId);
         }else{
             logger.error("msg",new RuntimeException("PROVIDER INVALID PARK_ID !!"));
         }
-        return invoker.invoke(invocation);
+        try {
+            return invoker.invoke(invocation);
+        }finally {
+            //防止内存泄露
+            TenantThreadLocalUtils.clearContext();
+        }
     }
 }

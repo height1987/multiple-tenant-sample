@@ -1,7 +1,7 @@
 package com.height.multiTenant.dubbo;
 
 import com.height.multiTenant.utils.TenantContext;
-import com.height.multiTenant.utils.ThreadLocalUtils;
+import com.height.multiTenant.utils.TenantThreadLocalUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.dubbo.rpc.*;
 import org.slf4j.Logger;
@@ -12,7 +12,7 @@ public class MultipleTenantConsumerFilter implements Filter{
     protected  static final Logger logger = LoggerFactory.getLogger(MultipleTenantConsumerFilter.class);
     @Override
     public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
-        String tenantId = ThreadLocalUtils.getContextStr();
+        String tenantId = TenantThreadLocalUtils.getContextStr();
         logger.info("MT_ConsumerFilter ： {}",tenantId);
 
         if(StringUtils.isEmpty(tenantId)){

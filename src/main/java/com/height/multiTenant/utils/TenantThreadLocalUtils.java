@@ -1,6 +1,6 @@
 package com.height.multiTenant.utils;
 
-public class ThreadLocalUtils {
+public class TenantThreadLocalUtils {
     private static final ThreadLocal<String> threadLocal = new ThreadLocal<String>() {
         @Override
         protected String initialValue() {
@@ -9,6 +9,9 @@ public class ThreadLocalUtils {
     };
     public static void setContextStr(String tenantContext) {
         threadLocal.set(tenantContext);
+    }
+    public static void clearContext(){
+        threadLocal.remove();
     }
 
     public static String getContextStr() {

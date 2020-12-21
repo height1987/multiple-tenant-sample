@@ -3,12 +3,14 @@ package com.height.multiTenant.webInterceptor;
 import com.alibaba.fastjson.JSONObject;
 import com.height.multiTenant.utils.CookieUtils;
 import com.height.multiTenant.utils.TenantContext;
-import com.height.multiTenant.utils.ThreadLocalUtils;
+import com.height.multiTenant.utils.TenantThreadLocalUtils;
 import org.apache.dubbo.rpc.RpcContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -47,7 +49,7 @@ public class ParkInterceptor implements HandlerInterceptor {
 			logger.info("tenantNo is empty");
 			return false;
 		}
-		ThreadLocalUtils.setContextStr(TenantContext.getInstance(getParkId(tenantNo)).toString());
+		TenantThreadLocalUtils.setContextStr(TenantContext.getInstance(getParkId(tenantNo)).toString());
 				RpcContext.getContext().getAttachment(TenantContext.TENANT_CONTENT_KEY);
 		return true;
 
@@ -65,5 +67,10 @@ public class ParkInterceptor implements HandlerInterceptor {
 		response.getWriter().write(JSONObject.toJSON(responseMessage).toString());
 	}
 
+
+	@Override
+	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable ModelAndView modelAndView) throws Exception {
+		TenantThreadLocalUtils.clearContext();
+	}
 
 }
