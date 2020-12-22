@@ -33,3 +33,4 @@
 ![avatar](https://outter.oss-cn-shanghai.aliyuncs.com/dubbo%20filer%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F.jpg)
 
 ## 总结和资料
+- 多租户案例 ![url](https://github.com/baomidou/mybatis-plus-samples)
