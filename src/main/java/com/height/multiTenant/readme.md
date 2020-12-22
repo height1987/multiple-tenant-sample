@@ -32,5 +32,62 @@
 其中，dubbo的filter执行顺序如下：
 ![avatar](https://outter.oss-cn-shanghai.aliyuncs.com/dubbo%20filer%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F.jpg)
 
-## 总结和资料
-- 多租户案例 ![url](https://github.com/baomidou/mybatis-plus-samples)
+## 总结
+  在写这个的时候碰到了几个注意点：
+- dubbo RpcContext的问题
+    - 问题说明：dubbo的每次Rpc请求在返回的时候，都会把RpcContext清空。导致在controller调用服务时，如果联系调用2个服务，第二个服务的context会丢失。
+    - 解决：应用需要使用ThreadLocal来暂存当前的context，每次调用时，在先执行consumerFilter中把本地ThreadLocal的context放入RpcContext。
+
+```
+         public class MultipleTenantConsumerFilter implements Filter{
+         
+             @Override
+             public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
+                 //从本地的ThreadLocal中获取context
+                 String tenantId = TenantThreadLocalUtils.getContextStr();  
+                 logger.info("MT_ConsumerFilter ： {}",tenantId);
+         
+                 if(StringUtils.isEmpty(tenantId)){
+                     String msg = "CONSUMER INVALID PARK_ID !!";
+                     logger.error(msg,new RuntimeException(msg));
+                 }else{
+                     // 放入 RpcContext
+                     RpcContext.getContext().setAttachment(TenantContext.TENANT_CONTENT_KEY,tenantId);
+                 }
+                 return invoker.invoke(invocation);
+             }
+         }
+```
+
+
+- ThreadLocal问题
+    - 问题说明：通过ThreadLocal暂存context，但是在一次完整的请求结束后，没有清理context，会导致内存泄露。
+    - 解决：在providerFilter执行完业务逻辑后，清理本地的ThreadLocal。在web Interceptor的PostHandle中清理本次的ThreadLocal。
+    
+```
+  public class MultipleTenantProviderFilter implements Filter {
+      @Override
+      public Result invoke(Invoker<?> invoker, Invocation invocation) throws RpcException {
+          //服务端的filter，在执行业务代码之前先执行本filter
+          //从RpcContext中获取context
+          String tenantId = RpcContext.getContext().getAttachment(TenantContext.TENANT_CONTENT_KEY);
+          if(!StringUtils.isEmpty(tenantId)){
+              //把context放入本地ThreadLocal
+              //方便在本服务中调用后续服务的context传递
+              TenantThreadLocalUtils.setContextStr(tenantId);
+          }else{
+              logger.error("msg",new RuntimeException("PROVIDER INVALID PARK_ID !!"));
+          }
+          try {
+              return invoker.invoke(invocation);
+          }finally {
+              //本次请求在服务端执行结束后，释放当前线程的context
+              TenantThreadLocalUtils.clearContext();
+          }
+      }
+  }
+```
+
+## 资料
+- mybatis多租户案例: [git地址](https://github.com/baomidou/mybatis-plus-samples)
+- dubbo filter说明: [官方文档](http://dubbo.apache.org/zh/docs/v2.7/dev/impls/filter/#%E6%89%A9%E5%B1%95%E8%AF%B4%E6%98%8E)
